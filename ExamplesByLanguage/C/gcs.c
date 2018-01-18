@@ -21,8 +21,7 @@ int charCount(char* x)
     // iterate and count real chars
     int characters = 0;
 
-    while (*x != '\0')
-    {
+    while (*x != '\0') {
         characters++;
         x++;
     }
@@ -47,10 +46,8 @@ int main()
     int currentIter = 0;
 
     // iterate through the arrays, compare chars
-    for ( int i = 0; i <= ARRAY_LENGTH(string1); i++ )
-    {
-        if ( string1[i] == string2[i] )
-        {
+    for ( int i = 0; i <= ARRAY_LENGTH(string1); i++ ) {
+        if ( string1[i] == string2[i] ) {
             // if they match declare pointer, pass to append,
             // then increment the currentIter counter
             char* ptrCurrent = &current[currentIter];
