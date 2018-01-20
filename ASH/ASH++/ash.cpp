@@ -14,9 +14,9 @@ int main()
     string x = "CDSVVVHVLKLQGAVPFVHTNVPQSMFSYDCSNPLFGQTVNPWKSSKSPGGSSGGEGALI";
     string y = "TDATVVALLKGAGAIPLGITNCSELCMWYESSNKIYGRSNNPYDLQHIVGGSSGGEGCTL";
     int l = 15;
-    vector<Entry> a = seq_to_seq(x,y,l);
+    vector <Entry> test_results = seq_to_seq(x,y,l);
 
-    for( Entry item : a) {
+    for( Entry item : test_results) {
         if (item.score > 4 ) {
             cout << item.pos << "\t";
             cout << item.seq << "\t";
