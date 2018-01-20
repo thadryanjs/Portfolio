@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <map>
+#include <map>              // for weights
 #include <stdlib.h>         // for abs() function
 #include "Entry.h"          // contains Entry class. Req for ash_utils
 #include "ash_utils.h"      // contains ASH functions
