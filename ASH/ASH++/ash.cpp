@@ -16,6 +16,8 @@ int main(void)
 
     // desired kmer length
     int kmer = 15;
+
+    // get a vector of Entry objects of results 
     vector <Entry> test_results = seq_to_seq(x, y, kmer);
 
     // iterate though vector of objects and display results
