@@ -8,14 +8,18 @@
 
 using namespace std;
 
-
-int main()
+int main(void)
 {
+    // two strings to analyze
     string x = "CDSVVVHVLKLQGAVPFVHTNVPQSMFSYDCSNPLFGQTVNPWKSSKSPGGSSGGEGALI";
     string y = "TDATVVALLKGAGAIPLGITNCSELCMWYESSNKIYGRSNNPYDLQHIVGGSSGGEGCTL";
-    int l = 15;
-    vector <Entry> test_results = seq_to_seq(x,y,l);
 
+    // desired kmer length
+    int kmer = 15;
+    vector <Entry> test_results = seq_to_seq(x, y, kmer);
+
+    // iterate though vector of objects and display results
+    // with a mistmatch score above, say, 4
     for( Entry item : test_results) {
         if (item.score > 4 ) {
             cout << item.pos << "\t";
