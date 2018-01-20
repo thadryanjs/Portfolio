@@ -20,7 +20,7 @@ This is located under the DataScience folder. Because analyzing text presents nu
 
 ### Examples By Language 
 
-Here you will find smaller programs where I tinker with a variety of languages: Python, Perl, C, C++, and Java. For R code, see the above classifier as I generally use it for Data Science tasks only. 
+Here you will find smaller programs where practice a variety of languages: Python, Perl, C, C++, and Java. For R code, see the above classifier as I generally use it for Data Science tasks only. 
 
 ### PythonInTheWyld.com
 
