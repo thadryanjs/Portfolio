@@ -79,8 +79,10 @@ vector<Entry> seq_to_seq(string seq1, string seq2, int length)
         // collect substrings at each position
         string current_peptide = seq1.substr(position, length);
         string compare_peptide = seq2.substr(position, length);
+
         // call mismatch to score the two compare_peptides
         double entry = mismatch(current_peptide, compare_peptide);
+
         // create and Entry object capturing the score, position,
         // the sequence, and what it was compared to
         Entry results_obj = Entry
@@ -90,6 +92,7 @@ vector<Entry> seq_to_seq(string seq1, string seq2, int length)
                 entry,              // score
                 compare_peptide     // match
         );
+        
         // capture the onject and advance the counter
         results.push_back(results_obj);
         position++;
