@@ -31,4 +31,5 @@ http://pythoninthewyld.com/home/contact/
 Thanks again for reading, and feel free to reach out with any questions through the contact link above.
 
 Regards,
+
 Thadryan 
