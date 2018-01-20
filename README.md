@@ -4,7 +4,7 @@ Hello World!
 
 Thanks for taking the time to look at my portfolio. 
 
-It is made up of a collection of projects in a variets of formats and languages. 
+It is made up of a collection of projects in a variety of formats and languages. 
 
 Here are the highlights:
 
