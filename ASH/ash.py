@@ -83,7 +83,13 @@ class ASH(object):
             self.match = match   # what it was compared to
             self.antg  = antg    # the simple antigenicty score
 
-    # getter to return entries if the user wants to script with the output
+
+#----------------------------------------------------------------------#
+#                            get_Entries                               #
+#----------------------------------------------------------------------#
+# Member of ASH class, not Entry. Basic getter method returns list of  #
+# Entry objects created when a new ASH object is created.              #                                 #
+#----------------------------------------------------------------------#
     def get_Entries(self):
         return self.results
 
@@ -239,6 +245,10 @@ class ASH(object):
                           item.match      + "\n")
 
         outfile.close()
+
+
+#-----------------------------------------------------------------------#
+
 
 main = ASH("ENV_HV1MN.fasta", "ENV_HV1VI.fasta", "ex.csv", 15)
 
