@@ -32,7 +32,7 @@ import sys
 from skbio.alignment import StripedSmithWaterman
 
 
-class ASH(object):
+class analyze(object):
 #----------------------------------------------------------------------#
 #                            constructor                               #
 #----------------------------------------------------------------------#
@@ -41,7 +41,7 @@ class ASH(object):
 # out of the files(get_seq), align the sequences (align), compare them #
 # using the scale(seq_to_seq), and writes the data to a csv            #
 #----------------------------------------------------------------------#
-    def __init__(self, first_seq_in, second_seq_in,outfile, kmer):
+    def __init__(self, first_seq_in, second_seq_in, outfile, kmer):
         # the kmer size
         self.kmer_size    = kmer
         # get the two sequences
@@ -273,5 +273,5 @@ try:
 except ValueError:
     sys.exit("Please enter and integer for kmer length")
 
-# create ASH object if everything is in order.
-main = ASH(first_seq_in, second_seq_in, outfile_name, kmer_arg)
+# create ash analyze object if everything is in order.
+main = analyze(first_seq_in, second_seq_in, outfile_name, kmer_arg)
