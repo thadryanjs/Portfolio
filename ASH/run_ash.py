@@ -82,10 +82,6 @@ class ASH(object):
             self.match = match   # what it was compared to
             self.antg  = antg    # the simple antigenicty score
 
-    # # getter to return entries if the user wants to script with the output
-    # def get_Entries(self):
-    #     return self.results
-
 
 #----------------------------------------------------------------------#
 #                            get_seq                                   #
