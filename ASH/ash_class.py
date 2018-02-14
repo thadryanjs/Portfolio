@@ -1,17 +1,26 @@
-
-###############################################################################
-#                                                                             #
-#   ASH - Antigen Selection Heuristic                                         #
-#                                                                             #
-#   This program is assist a user in finding regions                          #
-#                                                                             #
-#                                                                             #
-###############################################################################
-
+#----------------------------------------------------------------------#
+#               Antigen Selection Heuristic {ASH}                      #
+#----------------------------------------------------------------------#
+#                                                                      #
+# This program analyzes FASTA sequences to find regions of chemical    #
+# distinctness and antigenicty. It takes in two fasta files, a name    #
+# for an output file,and a desired Kmer length via the command line.   #
+# It scores them on a simple hydrophilicity-based scale developed for  #
+# this script. More on the thought process behind the ASH scale can be #
+# foond on the ASH github. It also implements a simple hydrophilicity  #
+# -based antigenicty metric that is currently under development at the #
+# time of tis writing (2/13/18). The intent is that this tool can help #
+# users analyze protein sequence for epitope/antigen selection by      #
+# automating the search for eptitopes that are distinct to their       #
+# protein or, conversly, find regions that are well conserved in       #
+# both. The output is a csv file containing information on all the     #
+# eptitopes in the first protein, it's ASH score, it's index in the    #
+# sequence, it's antigenicty rating, and the sequence it's analog in   #
+# the second sequence.                                                 #
+#----------------------------------------------------------------------#
 
 import sys
 from skbio.alignment import StripedSmithWaterman
-
 
 class ASH(object):
 #----------------------------------------------------------------------#
@@ -48,7 +57,10 @@ class ASH(object):
 #----------------------------------------------------------------------#
 # This is a nested class to store the results of the analysis. I opted #
 # to nest the class to compartmentalize the code and because the ASH   #
-# class is the only class that uses the entry class                    #
+# class is the only class that uses the entry class. It holds the      #
+# sequence, it's position, it's ASH and antigenicty scores, and the    #
+# sequence that it was compared to. Enties are created by the seq_to_  #
+# seq function. The results of this script is a list of Entry objects  #                              #
 #----------------------------------------------------------------------#
     class Entry(object):
         # arguments are passed to the contructor by the seq_to_seq function
@@ -59,10 +71,9 @@ class ASH(object):
             self.match = match   # what it was compared to
             self.antg  = antg    # the simple antigenicty score
 
-    # getter to return entries if the user wants to script with the output
-    def get_Entries(self):
-        return self.results
-
+    # # getter to return entries if the user wants to script with the output
+    # def get_Entries(self):
+    #     return self.results
 
 #----------------------------------------------------------------------#
 #                            get_seq                                   #
@@ -71,8 +82,11 @@ class ASH(object):
 # strips newlines, and concatenates sequences. Returns sequence        #
 #----------------------------------------------------------------------#
     def get_seq(self, filename):
+        # will store the sequence
         seq = ""
+        # bail if file is not valid
         data = open(filename, "r").readlines()
+        # get the sequence
         for line in data:
             if not line.startswith(">"):      # skips header
                 line = line.replace("\n", "") # removes newlines
@@ -141,7 +155,6 @@ class ASH(object):
                 score += self.weighted_score(input_seq1[i], input_seq2[i])
         return score
 
-
 #----------------------------------------------------------------------#
 #                            antigenicity                              #
 #----------------------------------------------------------------------#
@@ -155,7 +168,6 @@ class ASH(object):
             if item in simple_scores:
                 score += 1
         return round(score/len(seq), 2)
-
 
 #----------------------------------------------------------------------#
 #                            seq_to_seq                                #
@@ -209,18 +221,43 @@ class ASH(object):
 
         outfile.close()
 
-if len(sys.argv) < 5:
-    sys.exit("Incorrect number of arguments.")
 
+#----------------------------------------------------------------------#
+#                         __main script__                              #
+#----------------------------------------------------------------------#
+# Gets argv, handles exceptions, executes the program                  #
+#----------------------------------------------------------------------#
 
 # get the first fasta
-first_seq_in  = str(sys.argv[1])
+first_seq_in  = sys.argv[1]
 # get the second fasta
-second_seq_in = str(sys.argv[2])
+second_seq_in = sys.argv[2]
 # get name for outfile
-outfile_name  = str(sys.argv[3])
-# ge the arguments for kmers
-kmer_arg      = int(sys.argv[4])
+outfile_name  = sys.argv[3]
 
+# do we have the corrct number of arguments? ball if false
+if len(sys.argv) != 5:
+    sys.exit("Incorrect number of arguments.")
 
+# handle first file
+try:
+    test_file_one = open(first_seq_in, "r")
+except FileNotFoundError:
+    sys.exit("First file is invald.")
+test_file_one.close()
+
+# handle second file
+try:
+    test_file_two = open(second_seq_in, "r")
+except FileNotFoundError:
+    sys.exit("Second file is invald.")
+test_file_two.close()
+
+# is kmer a number? bail is false
+try:
+    kmer_arg      = int(sys.argv[4])
+except ValueError:
+    sys.exit("Please enter and integer for kmer length")
+
+# create ASH object if everything is in order.
 main = ASH(first_seq_in, second_seq_in, outfile_name, kmer_arg)
