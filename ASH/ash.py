@@ -72,16 +72,15 @@ class analyze(object):
 #----------------------------------------------------------------------#
     class entry(object):
         # arguments are passed to the contructor by the seq_to_seq function
-        def __init__(self, seq, pos, hy_score, str_score, analog):
+        def __init__(self, seq, pos, hy_score, str_score,
+                                         hy_pct, str_pct, analog):
             self.seq       = seq   # the peptide
             self.pos       = pos   # what index is appears
             self.hy_score  = hy_score   # the mismatch score
             self.str_score = str_score  # structural mismatch
             self.analog    = analog     # what it was compared to
-            self.hy_pct    = round(hy_score/len(seq),2)
-            self.str_pct   = round(str_score/len(seq), 2)
-            # self.antg  =  antg   # the simple antigenicty score
-            # self.strt  =  strt   # structural mismatch
+            self.hy_pct    = hy_pct
+            self.str_pct   = str_pct
 
 
 #----------------------------------------------------------------------#
@@ -177,7 +176,14 @@ class analyze(object):
                 score += self.hydro_score(input_seq1[i], input_seq2[i])
         return score
 
-#######
+
+#----------------------------------------------------------------------#
+#                           structure_score                            #
+#----------------------------------------------------------------------#
+# Takes two residues. It calls the structure_score function on the two #
+# residues at each index and returns the total subscore based of the   #
+# structurally complex residues                                        #
+#----------------------------------------------------------------------#
     def structure_score(self, residue1, residue2):
         weight = {  "L":+0.0, "A":+0.0, "F":+1.0, "Y":+1.0, "W":+1.0,
                     "I":+0.0, "V":+0.0, "H":+1.0, "N":+0.0, "C":+0.0,
@@ -195,7 +201,13 @@ class analyze(object):
         else:
             return subscore
 
-#######
+#----------------------------------------------------------------------#
+#                         structural_mismatch                          #
+#----------------------------------------------------------------------#
+# This takes two kmers and iterates through them. It calls the         #
+# structure_score function on the two residues at each index and       #
+# returns the total "mismatch" score for the kmer                      #
+#----------------------------------------------------------------------#
     def structural_mismatch(self, input_seq1, input_seq2):
         score = 0
         for i in range(len(input_seq1)):
@@ -206,15 +218,29 @@ class analyze(object):
         return score
 
 
-
 #----------------------------------------------------------------------#
-#                            antigenicity                              #
+#                           hydro_percent                              #
 #----------------------------------------------------------------------#
 # This function takes a simple measure of antigenicty based on the     #
 # percent of residues that are hydrophiles                             #
 #----------------------------------------------------------------------#
-    def antigenicity(self, seq):
+    def hydro_percent(self, seq):
         simple_scores = ["D","E","R","K"]
+        score = 0
+        for item in seq:
+            if item in simple_scores:
+                score += 1
+        return round(score/len(seq), 2)
+
+
+#----------------------------------------------------------------------#
+#                           struct_percent                             #
+#----------------------------------------------------------------------#
+# This function takes a simple measure of antigenicty based on the     #
+# percent of residues that are hydrophiles                             #
+#----------------------------------------------------------------------#
+    def struct_percent(self, seq):
+        simple_scores = ["F","Y","W","P","H"]
         score = 0
         for item in seq:
             if item in simple_scores:
@@ -243,21 +269,27 @@ class analyze(object):
             # starts at the currrent position, ends at position + kmer length
             current_peptide = seq1[position:position+length]
             compare_peptide = seq2[position:position+length]
-            # call mismatch on the current kmers
-            hydro_entry    = self.hydro_mismatch(current_peptide,
-                                                        compare_peptide)
-            struc_mismatch = self.structural_mismatch(current_peptide,
-                                                        compare_peptide)
+            # call hydro mismatch on the current kmers
+            hydro_entry     = self.hydro_mismatch(current_peptide,
+                                                  compare_peptide)
+            # get percent hydrophiles
+            hydro_entry_pct = self.hydro_percent(current_peptide)
+            # get structural mismatch of current kmers
+            struct_entry    = self.structural_mismatch(current_peptide,
+                                                       compare_peptide)
+            # find percent structurally complex residues
+            struct_entry_pct = self.struct_percent(current_peptide)
+
             # store results is an Entry object
-            results_obj = self.entry(
-                seq   = current_peptide,
-                pos   = position,
-                hy_score = hydro_entry,
-                str_score = struc_mismatch,
-                analog = compare_peptide)
-                # antg  = self.antigenicity(current_peptide),
-                #strt  = struc_mismatch)
-            # store objects, increment counter
+            results_obj   = self.entry(
+                seq       = current_peptide,
+                pos       = position,
+                hy_score  = hydro_entry,
+                hy_pct    = hydro_entry_pct,
+                str_score = struct_entry,
+                str_pct   = struct_entry_pct,
+                analog    = compare_peptide)
+            # store object, increment
             results.append(results_obj)
             position += 1
         return results
@@ -265,21 +297,9 @@ class analyze(object):
 
 #-----------------------------------------------------------------------#
 
-
-# call the class on two files with a kmer lengoth of 15
 main = analyze("ENV_HV1MN.fasta", "ENV_HV1VI.fasta", 15)
 
-# use get_entries getter method to extract results
-results = main.get_entries()
+e = main.get_entries()
 
-# iterate though them and filter    print(item.seq, item.score)
-for item in results:
-    if item.hy_score > 7:
-        print(item.seq, "\t", item.str_score, "\t", item.hy_score, "\t",
-        item.str_pct, "\t", item.hy_pct, "\t")
-
-
-
-
-# QIVSKLKEQFKNKTI 	 7.5 	 VKAELKSHFPNNTAI
-# IVSKLKEQFKNKTIV 	 7.5 	 KAELKSHFPNNTAIK
+for i in e:
+    print(i.seq)

@@ -41,7 +41,7 @@ class analyze(object):
 # out of the files(get_seq), align the sequences (align), compare them #
 # using the scale(seq_to_seq), and writes the data to a csv            #
 #----------------------------------------------------------------------#
-    def __init__(self, first_seq_in, second_seq_in, outfile, kmer):
+    def __init__(self, first_seq_in, second_seq_in, kmer):
         # the kmer size
         self.kmer_size    = kmer
         # get the two sequences
@@ -57,10 +57,6 @@ class analyze(object):
         self.results      = self.seq_to_seq(self.sequence1,
                                             self.sequence2,
                                             self.kmer_size)
-        # get name for outfile
-        self.outname      = outfile
-        # write the output to a csv file
-        self.output       = self.report(self.results)
 
 
 #----------------------------------------------------------------------#
@@ -76,17 +72,22 @@ class analyze(object):
 #----------------------------------------------------------------------#
     class entry(object):
         # arguments are passed to the contructor by the seq_to_seq function
-        def __init__(self, seq, pos, hy_score, str_score,
-                                         hy_pct, str_pct, analog):
-            self.seq       = seq   # the peptide
-            self.pos       = pos   # what index is appears
-            self.hy_score  = hy_score   # the mismatch score
-            self.str_score = str_score  # structural mismatch
-            self.analog    = analog     # what it was compared to
-            self.hy_pct    = hy_pct
-            self.str_pct   = str_pct
-            # self.antg  =  antg   # the simple antigenicty score
-            # self.strt  =  strt   # structural mismatch
+        def __init__(self, seq, pos, score, match, antg):
+            self.seq   =   seq   # the peptide
+            self.pos   =   pos   # what index is appears
+            self.score = score   # the mismatch score
+            self.match = match   # what it was compared to
+            self.antg  = antg    # the simple antigenicty score
+
+
+#----------------------------------------------------------------------#
+#                            get_Entries                               #
+#----------------------------------------------------------------------#
+# Member of ASH class, not Entry. Basic getter method returns list of  #
+# Entry objects created when a new ASH object is created.              #                                 #
+#----------------------------------------------------------------------#
+    def get_entries(self):
+        return self.results
 
 
 #----------------------------------------------------------------------#
@@ -135,12 +136,14 @@ class analyze(object):
 # This implements the scale on a pair of residues. It is called by the #
 # mismatch function to score pairs of peptides at an index             #
 #----------------------------------------------------------------------#
-    def hydro_score(self, residue1, residue2):
-        # hydrophiles are positive, hydrophobic is negative, neutral is 0
-        weight = {  "L":-0.5, "A":-0.5, "F":-0.5, "Y":-0.5, "W":-0.5,
-                    "I":-0.5, "V":-0.5, "H":+0.0, "N":+0.0, "C":+0.0,
-                    "G":+0.0, "M":+0.0, "Q":+0.0, "P":+0.0, "S":+0.0,
-                    "T":+0.0, "D":+0.5, "E":+0.5, "R":+0.5, "K":+0.5 }
+
+    # hydrophiles are positive, hydrophobic is negative, neutral is 0
+    weight = {  "L":-0.5, "A":-0.5, "F":-0.5, "Y":-0.5, "W":-0.5,
+                "I":-0.5, "V":-0.5, "H":+0.0, "N":+0.0, "C":+0.0,
+                "G":+0.0, "M":+0.0, "Q":+0.0, "P":+0.0, "S":+0.0,
+                "T":+0.0, "D":+0.5, "E":+0.5, "R":+0.5, "K":+0.5 }
+
+    def weighted_score(self, residue1, residue2, d):
         # a gap is given a score of two in our system
         if residue1 == "-" or residue2 == "-":
             return 2.0
@@ -160,7 +163,8 @@ class analyze(object):
 # weighted_score function on the two residues at each index and        #
 # returns the total "mismatch" score for the kmer                      #
 #----------------------------------------------------------------------#
-    def hydro_mismatch(self, input_seq1, input_seq2):
+    def mismatch(self, input_seq1, input_seq2,d):
+        weight = d
         score = 0
         # iterate through length
         for i in range(len(input_seq1)):
@@ -169,73 +173,18 @@ class analyze(object):
                 score += 0
             else:
                 # call the weighted_score score method
-                score += self.hydro_score(input_seq1[i], input_seq2[i])
-        return score
-
-#----------------------------------------------------------------------#
-#                           structure_score                            #
-#----------------------------------------------------------------------#
-# Takes two residues. It calls the structure_score function on the two #
-# residues at each index and returns the total subscore based of the   #
-# structurally complex residues                                        #
-#----------------------------------------------------------------------#
-    def structure_score(self, residue1, residue2):
-        weight = {  "L":+0.0, "A":+0.0, "F":+1.0, "Y":+1.0, "W":+1.0,
-                    "I":+0.0, "V":+0.0, "H":+1.0, "N":+0.0, "C":+0.0,
-                    "G":+0.0, "M":+0.0, "Q":+0.0, "P":+1.0, "S":+0.0,
-                    "T":+0.0, "D":+0.0, "E":+0.0, "R":+0.0, "K":+0.0 }
-
-        # a gap is given a score of two in our system
-        if residue1 == "-" or residue2 == "-":
-            return 2.0
-        # subscore is the abs value of the scores
-        subscore = abs(weight[residue1] - weight[residue2])
-        # same group returns 0.25
-        if subscore == 0:
-            return 0.5
-        else:
-            return subscore
-
-#----------------------------------------------------------------------#
-#                         structural_mismatch                          #
-#----------------------------------------------------------------------#
-# This takes two kmers and iterates through them. It calls the         #
-# structure_score function on the two residues at each index and       #
-# returns the total "mismatch" score for the kmer                      #
-#----------------------------------------------------------------------#
-    def structural_mismatch(self, input_seq1, input_seq2):
-        score = 0
-        for i in range(len(input_seq1)):
-            if input_seq1[i] == input_seq2[i]:
-                score += 0
-            else:
-                score += self.structure_score(input_seq1[i], input_seq2[i])
+                score += self.weighted_score(input_seq1[i], input_seq2[i], weight)
         return score
 
 
 #----------------------------------------------------------------------#
-#                           hydro_percent                              #
+#                            antigenicity                              #
 #----------------------------------------------------------------------#
 # This function takes a simple measure of antigenicty based on the     #
 # percent of residues that are hydrophiles                             #
 #----------------------------------------------------------------------#
-    def hydro_percent(self, seq):
+    def antigenicity(self, seq):
         simple_scores = ["D","E","R","K"]
-        score = 0
-        for item in seq:
-            if item in simple_scores:
-                score += 1
-        return round(score/len(seq), 2)
-
-
-#----------------------------------------------------------------------#
-#                           struct_percent                             #
-#----------------------------------------------------------------------#
-# This function takes a simple measure of antigenicty based on the     #
-# percent of residues that are hydrophiles                             #
-#----------------------------------------------------------------------#
-    def struct_percent(self, seq):
-        simple_scores = ["F","Y","W","P","H"]
         score = 0
         for item in seq:
             if item in simple_scores:
@@ -264,96 +213,32 @@ class analyze(object):
             # starts at the currrent position, ends at position + kmer length
             current_peptide = seq1[position:position+length]
             compare_peptide = seq2[position:position+length]
-            # call hydro mismatch on the current kmers
-            hydro_entry     = self.hydro_mismatch(current_peptide,
-                                                  compare_peptide)
-            # get percent hydrophiles
-            hydro_entry_pct = self.hydro_percent(current_peptide)
-            # get structural mismatch of current kmers
-            struct_entry    = self.structural_mismatch(current_peptide,
-                                                       compare_peptide)
-            # find percent structurally complex residues
-            struct_entry_pct = self.struct_percent(current_peptide)
-
+            # call mismatch on the current kmers
+            entry = self.mismatch(current_peptide, compare_peptide)
             # store results is an Entry object
-            results_obj   = self.entry(
-                seq       = current_peptide,
-                pos       = position,
-                hy_score  = hydro_entry,
-                hy_pct    = hydro_entry_pct,
-                str_score = struct_entry,
-                str_pct   = struct_entry_pct,
-                analog    = compare_peptide)
-            # store object, increment
+            results_obj = self.entry(
+                seq   = current_peptide,
+                pos   = position,
+                score = entry,
+                match = compare_peptide,
+                antg  = self.antigenicity(current_peptide))
+            # store objects, increment counter
             results.append(results_obj)
             position += 1
         return results
 
 
-#----------------------------------------------------------------------#
-#                              report                                  #
-#----------------------------------------------------------------------#
-# Writes a csv file with the stats of each object as a row             #
-#----------------------------------------------------------------------#
-    def report(self, records):
-        # open a file
-        outfile = open(self.outname + ".csv", "w")
-        # items for header
-        header = ["index", "sequence", "hy_score",
-                 "hy_pct", "str_score", "str_pct", "analog"]
-        # write header
-        for item in header:
-            outfile.write(item + ",")
-        outfile.write("\n")
-        # write the data
-        for item in records:
-            outfile.write(str(item.pos)       + "," +
-                          item.seq            + "," +
-                          str(item.hy_score)  + "," +
-                          str(item.str_score) + "," +
-                          str(item.hy_pct)    + "," +
-                          str(item.str_pct)   + "," +
-                          item.analog         + "\n")
-
-        outfile.close()
+#-----------------------------------------------------------------------#
 
 
-#----------------------------------------------------------------------#
-#                         __main script__                              #
-#----------------------------------------------------------------------#
-# Gets argv, handles exceptions, executes the program                  #
-#----------------------------------------------------------------------#
+# call the class on two files with a kmer lengoth of 15
+main = analyze("ENV_HV1MN.fasta", "ENV_HV1VI.fasta", 15)
 
-# get the first fasta
-first_seq_in  = sys.argv[1]
-# get the second fasta
-second_seq_in = sys.argv[2]
-# get name for outfile
-outfile_name  = sys.argv[3]
+# use get_entries getter method to extract results
+results = main.get_entries()
 
-# do we have the corrct number of arguments? ball if false
-if len(sys.argv) != 5:
-    sys.exit("Incorrect number of arguments.")
-
-# handle first file
-try:
-    test_file_one = open(first_seq_in, "r")
-except FileNotFoundError:
-    sys.exit("First file is invald.")
-test_file_one.close()
-
-# handle second file
-try:
-    test_file_two = open(second_seq_in, "r")
-except FileNotFoundError:
-    sys.exit("Second file is invald.")
-test_file_two.close()
-
-# is kmer a number? bail is false
-try:
-    kmer_arg      = int(sys.argv[4])
-except ValueError:
-    sys.exit("Please enter and integer for kmer length")
-
-# create ash analyze object if everything is in order.
-main = analyze(first_seq_in, second_seq_in, outfile_name, kmer_arg)
+# iterate though them and filter    print(item.seq, item.score)
+for item in results:
+    if item.score > 7:
+        print(item.seq, "\t", item.score, "\t",
+                        item.pos, "\t", item.antg, "\t", item.match)
