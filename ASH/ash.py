@@ -296,10 +296,3 @@ class analyze(object):
 
 
 #-----------------------------------------------------------------------#
-
-main = analyze("ENV_HV1MN.fasta", "ENV_HV1VI.fasta", 15)
-
-e = main.get_entries()
-
-for i in e:
-    print(i.seq)
