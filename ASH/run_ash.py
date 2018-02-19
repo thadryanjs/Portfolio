@@ -300,7 +300,7 @@ class analyze(object):
         outfile = open(self.outname + ".csv", "w")
         # items for header
         header = ["index", "sequence", "hy_score",
-                 "hy_pct", "str_score", "str_pct", "analog"]
+                 "str_score", "hy_pct", "str_pct", "analog"]
         # write header
         for item in header:
             outfile.write(item + ",")
