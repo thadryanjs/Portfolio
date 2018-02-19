@@ -204,9 +204,12 @@ class analyze(object):
 # returns the total "mismatch" score for the kmer                      #
 #----------------------------------------------------------------------#
     def structural_mismatch(self, input_seq1, input_seq2):
+        struct = ["F","Y","W","P","H"]
         score = 0
         for i in range(len(input_seq1)):
-            if input_seq1[i] == input_seq2[i]:
+            if input_seq1[i] not in struct and input_seq2[i] not in struct:
+                score += 0
+            elif input_seq1[i] == input_seq2[i]:
                 score += 0
             else:
                 score += self.structure_score(input_seq1[i], input_seq2[i])
