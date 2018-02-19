@@ -60,7 +60,7 @@ class analyze(object):
 
 
 #----------------------------------------------------------------------#
-#                          Entry(class)                                #
+#                          entry(class)                                #
 #----------------------------------------------------------------------#
 # This is a nested class to store the results of the analysis. I opted #
 # to nest the class to compartmentalize the code and because the ASH   #
@@ -84,7 +84,7 @@ class analyze(object):
 
 
 #----------------------------------------------------------------------#
-#                            get_Entries                               #
+#                            get_entries                               #
 #----------------------------------------------------------------------#
 # Member of ASH class, not Entry. Basic getter method returns list of  #
 # Entry objects created when a new ASH object is created.              #                                 #
