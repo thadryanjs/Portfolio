@@ -18,5 +18,5 @@ for record in hiv_entries[:5]:
 # conditional filtration to find distinct regions with good antigenicty
 print("Filtered Results:")
 for record in hiv_entries:
-    if record.hy_score > 10 and record.str_score > 4:
+    if record.hy_score > 10 and record.str_score > 2:
         print(record.seq, record.hy_score, "at", record.pos)
