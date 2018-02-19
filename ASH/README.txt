@@ -15,4 +15,4 @@ $ python3 run_ash.py ENV_HV1MN.fasta ENV_HV1VI.fasta test_out 16
 
 The first two arguments are the sequence to align, test_out will be the name of the csv file, and the kmers will be 16 residues long. 
 
-For those wish to script with the tools themselves, the package also includes ash.py which is a version of the ASH class without the reporting or error control, and the inclusion of a “getter” method (get_entries) to allow users to access the the entries themselves.  ash_example_script.py demonstrates how this might be used, and has test FASTA and a sample output.
+For those wish to script with the tools themselves, the package also includes ash.py which is a version of the ASH class without the reporting or error control, and the inclusion of a “getter” method (get_entries) to allow users to access the the entries themselves.  ash_example_script.py demonstrates how this might be used.
