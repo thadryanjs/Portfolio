@@ -134,7 +134,7 @@ class analyze(object):
 
 
 #----------------------------------------------------------------------#
-#                         weighted_score                               #
+#                           hydro__score                               #
 #----------------------------------------------------------------------#
 # This implements the scale on a pair of residues. It is called by the #
 # mismatch function to score pairs of peptides at an index             #
@@ -158,7 +158,7 @@ class analyze(object):
 
 
 #----------------------------------------------------------------------#
-#                              mismatch                                #
+#                       hydro_ mismatch                                #
 #----------------------------------------------------------------------#
 # This takes two kmers and iterates through them. It calls the         #
 # weighted_score function on the two residues at each index and        #
@@ -212,10 +212,13 @@ class analyze(object):
         struct = ["F","Y","W","P","H"]
         score = 0
         for i in range(len(input_seq1)):
+            # ignore if it they're both not a complex residue 
             if input_seq1[i] not in struct and input_seq2[i] not in struct:
                 score += 0
+            # match is nothing    
             elif input_seq1[i] == input_seq2[i]:
                 score += 0
+            # else use the weights to give score    
             else:
                 score += self.structure_score(input_seq1[i], input_seq2[i])
         return score
@@ -299,10 +302,11 @@ class analyze(object):
 
 
 #-----------------------------------------------------------------------#
-
+'''
 main = analyze("ENV_HV1MN.fasta", "ENV_HV1VI.fasta", 15)
 
 e = main.get_entries()
 
 for i in e:
     print(i.seq)
+'''

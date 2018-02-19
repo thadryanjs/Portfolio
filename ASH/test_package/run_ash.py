@@ -36,10 +36,10 @@ class analyze(object):
 #----------------------------------------------------------------------#
 #                            constructor                               #
 #----------------------------------------------------------------------#
-# The constructor takes 3 arguments: two .fasta files and an integer   #
-# of the desired kmer length. It calls functions to get the sequences  #
-# out of the files(get_seq), align the sequences (align), compare them #
-# using the scale(seq_to_seq), and writes the data to a csv            #
+# The constructor takes 4 arguments: two .fasta files, an integer of   #
+#vthe desired kmer length, outfile name. It calls functions to get the #
+#sequences out of the files(get_seq), align the sequences (align),     #
+#compare them  using the scale(seq_to_seq), and writes the data to csv #           
 #----------------------------------------------------------------------#
     def __init__(self, first_seq_in, second_seq_in, outfile, kmer):
         # the kmer size
@@ -64,7 +64,7 @@ class analyze(object):
 
 
 #----------------------------------------------------------------------#
-#                          Entry(class)                                #
+#                          entry(class)                                #
 #----------------------------------------------------------------------#
 # This is a nested class to store the results of the analysis. I opted #
 # to nest the class to compartmentalize the code and because the ASH   #
@@ -154,7 +154,7 @@ class analyze(object):
 
 
 #----------------------------------------------------------------------#
-#                              mismatch                                #
+#                          hydro_ mismatch                             #
 #----------------------------------------------------------------------#
 # This takes two kmers and iterates through them. It calls the         #
 # weighted_score function on the two residues at each index and        #
@@ -207,10 +207,13 @@ class analyze(object):
         struct = ["F","Y","W","P","H"]
         score = 0
         for i in range(len(input_seq1)):
+            # ignore if neither are in the list 
             if input_seq1[i] not in struct and input_seq2[i] not in struct:
                 score += 0
+            # mismatch of identical residues is a 0    
             elif input_seq1[i] == input_seq2[i]:
                 score += 0
+            # ekse score them     
             else:
                 score += self.structure_score(input_seq1[i], input_seq2[i])
         return score
