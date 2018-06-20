@@ -1,0 +1,11 @@
+A field that is both static and final has only one piece of storage that cannot
+be changed.
+
+When final is used with object references rather than primitives, the
+meaning can be confusing. With a primitive, final makes the value a
+constant, but with an object reference, final makes the reference a constant.
+Once the reference is initialized to an object, it can never be changed to point
+to another object. However, the object itself can be modified; Java does not
+provide a way to make any arbitrary object a constant. (You can, however,
+write your class so that objects have the effect of being constant.) This
+restriction includes arrays, which are also objects.
