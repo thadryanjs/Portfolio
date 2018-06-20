@@ -38,7 +38,6 @@ func Talk(s Speaker) {
 }
 
 
-
 // le main
 func main() {
 
