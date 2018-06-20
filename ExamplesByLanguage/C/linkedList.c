@@ -76,8 +76,7 @@ void nuke(node* list, int target)
 	// just at to replace you're "next" when you find target
 	while(current != NULL && current -> data != target) {
 		// hand off location to "previous", advance to next
-		prev = current;
-		current = current -> next;
+		prev = current;		current = current -> next;
 	}
 
 	// if you never find it, return nothing
@@ -127,5 +126,3 @@ int main()
 
 return 0;
 }
-
-
