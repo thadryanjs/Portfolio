@@ -4,11 +4,13 @@ Hello World!
 
 Thanks for taking the time to look at my portfolio. 
 
-It is made up of a collection of projects in a variety of formats and languages. 
+It is made up of a collection of projects in a variety of formats and languages.
 
+Current interests: Right now I am focused on Bioinformatics/Data Science code in Python and making Web Apps in Scala. I am also fresh of a Java binge using Bruce Eckel's classic, "Thinking in Java".
+ 
 Here are the highlights:
 
-[a note on comments: My code on here is pretty heavily commented, enough that some might say "overcommented". This is to demonstrate that I understand the concepts fully and not always indicitive of how I would comment a project I was working on as part of a team.]
+[note: My code on here is pretty heavily commented, enough that some might say "overcommented". This is to demonstrate that I understand the concepts fully and not always indicitive of how I would comment a project I was working on as part of a team.]
 ### ASH
 
 ASH (Antigen Selection Heuristic) is a working prototype bioinformatics tool that finds chemically distinct regions in proteins. When designing an antibody to target a protein, it is often beneficial to know which regions are the most distinct. This helps manage the odds of cross-reactivity. For example, if you want to study XYZprotein1 but not XYZprotein2, selecting a region that composed of the same amino acid sequence in both of them will make it likely that your assays are sensitive to both targets.
