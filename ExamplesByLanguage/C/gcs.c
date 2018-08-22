@@ -6,7 +6,7 @@
 
 // define and append function - adds character to end
 // of char array passed as a pointer
-void append(char* string, char character)
+void append(char *string, char character)
 {
     // find length, add character at that index, add null term.
     int len = strlen(string);
@@ -16,7 +16,7 @@ void append(char* string, char character)
 
 // define a function that counts the number of
 // non '\0' in a character array
-int charCount(char* x)
+int charCount(char *x)
 {
     // iterate and count real chars
     int characters = 0;
