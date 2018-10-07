@@ -128,7 +128,7 @@ class Analysis(object):
     def hydro_score(self, residue1, residue2):
         if residue1 == "-" or residue2 == "-":
             return 2.0
-
+        # matches can't have distance
         if residue1 == residue2:
             return 0
         # subscore is the abs value of the scores
