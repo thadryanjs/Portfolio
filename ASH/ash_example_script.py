@@ -5,7 +5,7 @@
 import ASH
 
 # call the function on two files, select kmer size
-hiv_ash_obj = ASH.Analysis("test_data/ENV_HV1MN.fasta", "test_data/ENV_HV1VI.fasta", 15)
+hiv_ash_obj = ASH.Analysis("sample_data/ENV_HV1MN.fasta", "sample_data/ENV_HV1VI.fasta", 15)
 
 # print alignment
 print("Aligned Sequences:")
