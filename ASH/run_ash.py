@@ -4,7 +4,7 @@ import sys
 import ASH
 
 
- """   |get flagged commandline arguments|   """
+"""   |get flagged commandline arguments|   """
 
 parser = argparse.ArgumentParser()
 
@@ -39,6 +39,7 @@ except ValueError:
 
 """   |main|   """
 
+# get Analysis object
 ash_obj = ASH.Analysis(args.fasta1, args.fasta2, args.kmer)
 
 # open outfile
@@ -47,7 +48,7 @@ with open(args.outfile, "w") as outfile:
     outfile.write("\t".join(["seq", "pos", "hy_score", "str_score", "analog", "hy_pct", "str_pct\n"]))
     # iterate entries in ASH report
     for e in ash_obj.get_entries():
-        # get entries attributes as strings, write them to csv 
+        # get entries attributes as strings, write them to csv
         out_data = map(str, [e.seq, e.pos, e.hy_score, e.str_score, e.analog, e.hy_pct, e.str_pct, "\n"])
         outfile.write("\t".join(out_data))
     outfile.close()

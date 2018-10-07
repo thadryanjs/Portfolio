@@ -111,6 +111,9 @@ class Analysis(object):
         # align second seq against initial query
         align = query(seq2)
         # add individual sequences to results
+        print(align.aligned_query_sequence)
+        print(align.aligned_target_sequence)
+
         aligned_seqs.append(align.aligned_query_sequence)
         aligned_seqs.append(align.aligned_target_sequence)
         return aligned_seqs
@@ -125,6 +128,9 @@ class Analysis(object):
     def hydro_score(self, residue1, residue2):
         if residue1 == "-" or residue2 == "-":
             return 2.0
+
+        if residue1 == residue2:
+            return 0
         # subscore is the abs value of the scores
         subscore = abs(self.weight[residue1] - self.weight[residue2])
         # same group returns 0.25
