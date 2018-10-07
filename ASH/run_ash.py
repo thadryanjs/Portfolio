@@ -43,8 +43,31 @@ except ValueError:
 ash_obj = ASH.Analysis(args.fasta1, args.fasta2, args.kmer)
 
 # get entry objects
-ash_entries = ash_obj.get_entries()
+
+
+#ash_entries = ash_obj.get_entries()
 
 # inspect their seq attribute
-for e in ash_entries:
-    print(e.seq)
+# for e in ash_entries:
+#     print(e.seq)
+
+# class Entry(object):
+#     # arguments are passed to the contructor by the seq_to_seq function
+#     def __init__(self, seq, pos, hy_score, str_score,
+#                                 hy_pct, str_pct, analog):
+#         self.seq       = seq   # the peptide
+#         self.pos       = pos   # what index is appears
+#         self.hy_score  = hy_score   # the mismatch score
+#         self.str_score = str_score  # structural mismatch
+#         self.analog    = analog     # what it was compared to
+#         self.hy_pct    = hy_pct
+#         self.str_pct   = str_pct
+
+
+with open(args.outfile, "w") as outfile:
+    outfile.write("\t".join(["seq", "pos", "hy_score", "str_score", "analog", "hy_pct", "str_pct\n"]))
+    for e in ash_obj.get_entries():
+        out_data = [e.seq, e.pos, e.hy_score, e.str_score, e.analog, e.hy_pct, e.str_pct, "\n"]
+        out_data = map(str, out_data)
+        outfile.write("\t".join(out_data))
+    outfile.close()
