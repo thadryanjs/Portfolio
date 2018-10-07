@@ -76,3 +76,17 @@ def test_mismatch_phile_v_neutral():
 # test simple phone vs neutral
 def test_mismatch_phobe_v_neutral():
     assert(test_obj.hydro_mismatch("LL", "HH") == 1.0)
+
+""" structure_score """
+
+# does a mismatch get noticed?
+def test_struct_score_miss():
+    assert(test_obj.structural_mismatch("A", "Y") == 1)
+
+# does a match get ignored?
+def test_struct_score_hit():
+    assert(test_obj.structural_mismatch("F", "F") == 0)
+
+# does a similar residue get less weight?
+def test_struct_score_hit2():
+    assert(test_obj.structural_mismatch("F", "H") == 0.5)

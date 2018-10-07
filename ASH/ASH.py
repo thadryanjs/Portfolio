@@ -116,9 +116,6 @@ class Analysis(object):
         # align second seq against initial query
         align = query(seq2)
         # add individual sequences to results
-        print(align.aligned_query_sequence)
-        print(align.aligned_target_sequence)
-
         aligned_seqs.append(align.aligned_query_sequence)
         aligned_seqs.append(align.aligned_target_sequence)
         return aligned_seqs
@@ -282,14 +279,3 @@ class Analysis(object):
             results.append(results_obj)
             position += 1
         return results
-
-
-#-----------------------------------------------------------------------#
-'''
-main = analyze("ENV_HV1MN.fasta", "ENV_HV1VI.fasta", 15)
-
-e = main.get_entries()
-
-for i in e:
-    print(i.seq)
-'''
