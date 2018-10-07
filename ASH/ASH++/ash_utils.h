@@ -92,7 +92,7 @@ vector<Entry> seq_to_seq(string seq1, string seq2, int length)
                 entry,              // score
                 compare_peptide     // match
         );
-        
+
         // capture the onject and advance the counter
         results.push_back(results_obj);
         position++;
