@@ -12,3 +12,6 @@ The script was written using Python 3.5, with the additional dependency of sciki
 The test_package includes two FASTA files for testing purposes, so main the program, run_ash.py, could be run as follows:
 
 $ python3 run_ash.py --fasta1 sample_data/ENV_HV1MN.fasta --fasta2 sample_data/ENV_HV1VI.fasta --kmer 12 --outfile test_out.csv
+
+to run the unit tests, run the following command from the ASH directory:
+$ python3 test/run_tests.py
