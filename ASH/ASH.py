@@ -35,10 +35,15 @@ from models.Entry import Entry
 class Analysis(object):
 
     # hydrophiles are positive, hydrophobic is negative, neutral is 0
-    weight = {  "L":-0.5, "A":-0.5, "F":-0.5, "Y":-0.5, "W":-0.5,
-                "I":-0.5, "V":-0.5, "H":+0.0, "N":+0.0, "C":+0.0,
-                "G":+0.0, "M":+0.0, "Q":+0.0, "P":+0.0, "S":+0.0,
-                "T":+0.0, "D":+0.5, "E":+0.5, "R":+0.5, "K":+0.5 }
+    hydro_weight = {  "L":-0.5, "A":-0.5, "F":-0.5, "Y":-0.5, "W":-0.5,
+                      "I":-0.5, "V":-0.5, "H":+0.0, "N":+0.0, "C":+0.0,
+                      "G":+0.0, "M":+0.0, "Q":+0.0, "P":+0.0, "S":+0.0,
+                      "T":+0.0, "D":+0.5, "E":+0.5, "R":+0.5, "K":+0.5 }
+
+    struct_weight = {  "L":+0.0, "A":+0.0, "F":+1.0, "Y":+1.0, "W":+1.0,
+                       "I":+0.0, "V":+0.0, "H":+1.0, "N":+0.0, "C":+0.0,
+                       "G":+0.0, "M":+0.0, "Q":+0.0, "P":+1.0, "S":+0.0,
+                       "T":+0.0, "D":+0.0, "E":+0.0, "R":+0.0, "K":+0.0 }
 
 #----------------------------------------------------------------------#
 #                            constructor                               #
@@ -132,7 +137,7 @@ class Analysis(object):
         if residue1 == residue2:
             return 0
         # subscore is the abs value of the scores
-        subscore = abs(self.weight[residue1] - self.weight[residue2])
+        subscore = abs(self.hydro_weight[residue1] - self.hydro_weight[residue2])
         # same group returns 0.25
         if subscore == 0:
             return 0.25
@@ -168,16 +173,11 @@ class Analysis(object):
 # structurally complex residues                                        #
 #----------------------------------------------------------------------#
     def structure_score(self, residue1, residue2):
-        weight = {  "L":+0.0, "A":+0.0, "F":+1.0, "Y":+1.0, "W":+1.0,
-                    "I":+0.0, "V":+0.0, "H":+1.0, "N":+0.0, "C":+0.0,
-                    "G":+0.0, "M":+0.0, "Q":+0.0, "P":+1.0, "S":+0.0,
-                    "T":+0.0, "D":+0.0, "E":+0.0, "R":+0.0, "K":+0.0 }
-
         # a gap is given a score of two in our system
         if residue1 == "-" or residue2 == "-":
             return 2.0
         # subscore is the abs value of the scores
-        subscore = abs(weight[residue1] - weight[residue2])
+        subscore = abs(self.struct_weight[residue1] -self.struct_weight[residue2])
         # same group returns 0.25
         if subscore == 0:
             return 0.5

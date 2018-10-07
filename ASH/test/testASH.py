@@ -6,7 +6,10 @@ from ASH import Analysis
 
 test_obj = Analysis("test/test1.fasta", "test/test2.fasta", 15)
 
-### testing get seq
+
+
+""" testing get seq """
+
 def test_get_seq_first():
     print("testing get_seq, first sequence")
     assert(test_obj.first_fasta == "MRVKGIRRNYQHWWGWGTMLLGLLMICSATEKLWVTVYYGVPVWKEATTTLFCASDAKAY")
@@ -22,7 +25,9 @@ def test_hydro_percent_positive():
 def test_hydro_percent_negative():
     assert(test_obj.hydro_percent("LLLLL") == 0)
 
-### hydro_score
+
+
+""" hydro_score """
 
 # test residue vs underscore
 def test_hydro_score_on_underscore():
@@ -56,3 +61,18 @@ def test_phile_vs_neutral():
 # a neutral vs a neutral residue
 def test_phile_vs_neutral():
     assert(test_obj.hydro_score("T", "H") == 0.25)
+
+
+""" hydro_mismatch """
+
+# test simple phile vs phobe
+def test_mismatch_phile_v_phobe():
+    assert(test_obj.hydro_mismatch("DD", "LL") == 2.0)
+
+# test simple phile vs neutral
+def test_mismatch_phile_v_neutral():
+    assert(test_obj.hydro_mismatch("DD", "HH") == 1.0)
+
+# test simple phone vs neutral
+def test_mismatch_phobe_v_neutral():
+    assert(test_obj.hydro_mismatch("LL", "HH") == 1.0)
