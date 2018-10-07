@@ -67,7 +67,6 @@ ash_obj = ASH.Analysis(args.fasta1, args.fasta2, args.kmer)
 with open(args.outfile, "w") as outfile:
     outfile.write("\t".join(["seq", "pos", "hy_score", "str_score", "analog", "hy_pct", "str_pct\n"]))
     for e in ash_obj.get_entries():
-        out_data = [e.seq, e.pos, e.hy_score, e.str_score, e.analog, e.hy_pct, e.str_pct, "\n"]
-        out_data = map(str, out_data)
+        out_data = map(str, [e.seq, e.pos, e.hy_score, e.str_score, e.analog, e.hy_pct, e.str_pct, "\n"])
         outfile.write("\t".join(out_data))
     outfile.close()
