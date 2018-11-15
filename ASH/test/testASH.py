@@ -24,9 +24,14 @@ def test_get_seq_second():
 def test_hydro_percent_positive():
     assert(test_obj.hydro_percent("DDDDD") == 1)
 
+def test_hydro_percent_positive_mixed():
+    assert(test_obj.hydro_percent("DDGD") == 0.75)
+
 def test_hydro_percent_negative():
     assert(test_obj.hydro_percent("LLLLL") == 0)
 
+def test_hydro_percent_negative_mixed():
+    assert(test_obj.hydro_percent("LLLG") == 0)
 
 
 """ hydro_score """
@@ -84,8 +89,15 @@ def test_mismatch_phile_v_neutral():
 def test_mismatch_phobe_v_neutral():
     assert(test_obj.hydro_mismatch("LL", "HH") == 1.0)
 
-def test_mismatch_on_peptides():
+def test_mismatch_on_simple_peptides():
     assert(test_obj.hydro_mismatch("PEPTIDE", "PEPTYDE") == 0.25)
+
+def test_mismatch_on_peptides_with_gap():
+    assert(test_obj.hydro_mismatch("PEPT-DE", "PEPTYDE") == 2.0)
+
+def test_mismatch_on_peptides_with_two_gaps():
+    assert(test_obj.hydro_mismatch("PEPT-DE", "PEPT-DE") == 0)
+
 
 
 """ structure_score """
@@ -95,9 +107,9 @@ def test_struct_score_miss():
     assert(test_obj.structural_mismatch("A", "Y") == 1)
 
 # does a match get ignored?
-def test_struct_score_hit():
+def test_struct_score_hit_match():
     assert(test_obj.structural_mismatch("F", "F") == 0)
 
 # does a similar residue get less weight?
-def test_struct_score_hit2():
+def test_struct_score_non_match():
     assert(test_obj.structural_mismatch("F", "H") == 0.5)
