@@ -128,13 +128,19 @@ class Analysis(object):
 # mismatch function to score pairs of peptides at an index             #
 #----------------------------------------------------------------------#
     def hydro_score(self, residue1, residue2):
-        if residue1 == "-" or residue2 == "-":
-            return 2.0
+
         # matches can't have distance
         if residue1 == residue2:
             return 0
+
+        # if either of them is a gap, return 2
+        # we've already established they don't match
+        if residue1 == "-" or residue2 == "-":
+            return 2.0
+
         # subscore is the abs value of the scores
         subscore = abs(self.hydro_weight[residue1] - self.hydro_weight[residue2])
+
         # same group returns 0.25
         if subscore == 0:
             return 0.25

@@ -18,6 +18,8 @@ def test_get_seq_second():
     print("testing get_seq, second sequence")
     assert(test_obj.second_fasta == "MRVRGMQRNWQHLGKWGLLFLGILIICNAADNLWVTVYYGVPVWKEATTTLFCASDAKAY")
 
+
+
 ### hydro_precent
 def test_hydro_percent_positive():
     assert(test_obj.hydro_percent("DDDDD") == 1)
@@ -33,6 +35,9 @@ def test_hydro_percent_negative():
 def test_hydro_score_on_underscore():
     # highest distance is a residue to a gap
     assert(test_obj.hydro_score("A", "-") == 2)
+
+def test_hydro_two_underscores():
+    assert(test_obj.hydro_score("-", "-") == 0)
 
 # test phile to no-identical phile
 def test_hydro_score_on_same_group_phile():
@@ -76,6 +81,7 @@ def test_mismatch_phile_v_neutral():
 # test simple phone vs neutral
 def test_mismatch_phobe_v_neutral():
     assert(test_obj.hydro_mismatch("LL", "HH") == 1.0)
+
 
 """ structure_score """
 
