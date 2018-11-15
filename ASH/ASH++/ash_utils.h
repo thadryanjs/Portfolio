@@ -18,6 +18,7 @@ double score_residues(char residue1, char residue2)
 {
     // get absolute value
     float subscore = abs(weight[residue1] - weight[residue2]);
+
     // same type, no match (evaluated prior) gives smallest mismatch
     if ( subscore == 0 ) {
         return 0.25;
@@ -75,6 +76,7 @@ vector<Entry> seq_to_seq(string seq1, string seq2, int length)
 
     // while incrementing won't exceed length of strings
     while( position + length <= seq1.length() ) {
+  
         // collect substrings at each position
         string current_peptide = seq1.substr(position, length);
         string compare_peptide = seq2.substr(position, length);
@@ -92,7 +94,7 @@ vector<Entry> seq_to_seq(string seq1, string seq2, int length)
                 compare_peptide     // match
         );
 
-        // capture the onject and advance the counter
+        // capture the object and advance the counter
         results.push_back(results_obj);
         position++;
     }

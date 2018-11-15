@@ -14,7 +14,7 @@ class Entry
         // where in the sull seq it is located
         int pos;
 
-        // what score it is given by the algorith
+        // what score it is given by the algorithm
         double score;
 
         // kmer in second sequence it was compared to
