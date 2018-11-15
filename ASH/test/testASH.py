@@ -36,6 +36,7 @@ def test_hydro_score_on_underscore():
     # highest distance is a residue to a gap
     assert(test_obj.hydro_score("A", "-") == 2)
 
+# gap to gap should be no penalty
 def test_hydro_two_underscores():
     assert(test_obj.hydro_score("-", "-") == 0)
 
@@ -68,6 +69,7 @@ def test_phile_vs_neutral():
     assert(test_obj.hydro_score("T", "H") == 0.25)
 
 
+
 """ hydro_mismatch """
 
 # test simple phile vs phobe
@@ -78,9 +80,12 @@ def test_mismatch_phile_v_phobe():
 def test_mismatch_phile_v_neutral():
     assert(test_obj.hydro_mismatch("DD", "HH") == 1.0)
 
-# test simple phone vs neutral
+# test simple phobe vs neutral
 def test_mismatch_phobe_v_neutral():
     assert(test_obj.hydro_mismatch("LL", "HH") == 1.0)
+
+def test_mismatch_on_peptides():
+    assert(test_obj.hydro_mismatch("PEPTIDE", "PEPTYDE") == 0.25)
 
 
 """ structure_score """
