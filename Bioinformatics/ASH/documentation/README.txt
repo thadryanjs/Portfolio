@@ -13,5 +13,5 @@ The test_package includes two FASTA files for testing purposes, so main the prog
 
 $ python3 run_ash.py --fasta1 sample_data/ENV_HV1MN.fasta --fasta2 sample_data/ENV_HV1VI.fasta --kmer 12 --outfile test_out.csv
 
-to run the unit tests, run the following command from the ASH directory:
-$ python3 test/run_tests.py
+to run the unit tests, run the following command from the ASH directory, substituting your path to pytests
+$ /home/bbbuser/.local/bin/pytest test/testASH.py

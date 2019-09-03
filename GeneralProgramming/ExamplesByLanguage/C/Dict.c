@@ -104,15 +104,15 @@ int listSize(struct Node *head)
 // takes key, brings value
 char *lookUp(char *value, struct Node *d)
 {
-    // default answer
-    char *current = "KEYNOTFOUND";
+  // default answer
+  char *current = "KEYNOTFOUND";
 	char *result = current;
     while(d != NULL) {
         if(d->key == value)
             result = d->value;
         d = d->next;
 	}
-    // if we are still on default
+  // if we are still on default
 	if(result == current)
 		printf("Warning: no result found for %s, returning default\n", value);
 	return result;
@@ -150,7 +150,7 @@ void deleteEntry(char *key, struct Node **headRef)
         temp = temp->next;
     }
     // if we never found it, bail
-    if(previous == NULL) reurn;
+    if(previous == NULL) return;
 
     // or else previous becomes new head, delete old head
     previous->next = temp->next;

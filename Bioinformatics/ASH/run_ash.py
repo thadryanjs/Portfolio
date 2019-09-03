@@ -8,10 +8,10 @@ import ASH
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-f1", "--fasta1")
-parser.add_argument("-f2", "--fasta2")
-parser.add_argument("-k, ", "--kmer")
-parser.add_argument("-o, ", "--outfile")
+parser.add_argument("-f1", "--fasta1", required = True)
+parser.add_argument("-k, ", "--kmer", required = True)
+parser.add_argument("-f2", "--fasta2", required = True)
+parser.add_argument("-o, ", "--outfile", required = True)
 
 # parse them
 args = parser.parse_args()

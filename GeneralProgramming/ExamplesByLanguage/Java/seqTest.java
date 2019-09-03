@@ -1,4 +1,4 @@
-// This a sequence class designed to make an 
+// This a sequence class designed to make an
 // object from a single entry fasta file
 
 import java.io.FileReader;
@@ -12,7 +12,7 @@ class Sequence
 	String fasta;
 	int seqLength;
 
-	// constructor 
+	// constructor
 	Sequence(String fileName)
 	{
 		String[] arr = getFasta(fileName);
@@ -29,12 +29,12 @@ class Sequence
 		// and future file lines
 		String file = fileName;
 		String line = null;
-		
+
 		// decalre variables for header and sequence
 		String header = "";
 		String sequence = "";
-		
-		// use try/catch idiom for fileIO		
+
+		// use try/catch idiom for fileIO
 		try
 		{
 			// reader and buffer objects
@@ -45,7 +45,7 @@ class Sequence
 				new BufferedReader(fileReader);
 
 
-			// while the reader still has lines 
+			// while the reader still has lines
 			while(( line = bufferedReader.readLine()) != null)
 			{
 				// fasta uses ">" for delineation
@@ -78,10 +78,10 @@ class Sequence
 
 public class seqTest
 {
-	public static void main(String args[])
+	public static void main(String[] args)
 	{
 		// create Seq object
-		Sequence seqObj = new Sequence("in.txt");
+		Sequence seqObj = new Sequence("ENV_HV1MN.fasta");
 
 		// test that it worked
 		System.out.println("The header is: ");
