@@ -118,7 +118,7 @@ char *lookUp(char *value, struct Node *d)
 	return result;
 }
 
-// deletes who list
+// deletes whole list
 void deleteList(struct Node **headRef)
 {
     struct Node *current = *headRef;
@@ -134,53 +134,25 @@ void deleteList(struct Node **headRef)
     *headRef = NULL;
 }
 
-// // deletes first occurence of specific entries
-// void deleteEntry(char *key, struct Node **headRef)
-// {
-//     struct Node *temp = *headRef, *previous;
-//     // if we are starting on it, move head up, delete "current"
-//     if(temp != NULL && temp->key == key) {
-//         *headRef = temp->next; // why you need a ref
-//         free(temp);
-//         return;
-//     }
-//     // if we haven't found the key or the end
-//     while(temp != NULL && temp->key != key) {
-//         previous = temp;
-//         temp = temp->next;
-//     }
-//     // if we never found it, bail
-//     if(previous == NULL) return;
-//
-//     // or else previous becomes new head, delete old head
-//     previous->next = temp->next;
-//     free(temp);
-// }
-
-//
-
-// // test version to mess around with
-// this removes the need for a third variable
-// I guess it's just to make the pointers cleaner
+// deletes first occurence of specific entries
 void deleteEntry(char *key, struct Node **headRef)
 {
-    struct Node *temp = *headRef;
-
+    struct Node *temp = *headRef, *previous;
     // if we are starting on it, move head up, delete "current"
-    if(*headRef != NULL && (*headRef)->key == key) {
+    if(temp != NULL && temp->key == key) {
         *headRef = temp->next; // why you need a ref
         free(temp);
         return;
     }
     // if we haven't found the key or the end
-    while(*headRef != NULL && (*headRef)->key != key) {
-        temp = *headRef;
-        *headRef = temp->next;
+    while(temp != NULL && temp->key != key) {
+        previous = temp;
+        temp = temp->next;
     }
     // if we never found it, bail
-    if(temp == NULL) return;
+    if(previous == NULL) reurn;
 
     // or else previous becomes new head, delete old head
-    (*headRef)->next = temp->next;
-    free(*headRef);
+    previous->next = temp->next;
+    free(temp);
 }
