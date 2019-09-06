@@ -31,9 +31,7 @@ Because analyzing text presents numerous challenges in the form of word-stemming
 
 ### PythonInTheWyld.com
 
-I am building a teach-yourself-python website that can be found at http://pythoninthewyld.com/.
-I am not a heavy social media user, but do keep up a light presence for the site, and you can get in touch here:
-http://pythoninthewyld.com/home/contact/
+I am building a [teach-yourself-python website](http://pythoninthewyld.com/). I am not a heavy social media user, but do keep up a light presence for the site, so feel free to [get in touch](http://pythoninthewyld.com/home/contact/).
 
 ### Examples By Language
 
