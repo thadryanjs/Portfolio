@@ -19,7 +19,7 @@ ASH uses a scale based on hyrdophilicity to compare residues. It used this scale
 
 ### StRuen
 
-An R Shiny app that permits interactive visualization of the Wisconsin breast cancer dataset. There is also an extra, fictitious (randomly generated) "cohort" variable to permit demonstration of some additional features (tracking members of the same cohort across multiple graphs). check it out [here](https://www.youtube.com/watch?v=qcZ4sB-RUk4).
+An R Shiny app that permits interactive visualization of the Wisconsin breast cancer dataset. There is also an extra, fictitious (randomly generated) "cohort" variable to permit demonstration of some additional features (tracking members of the same cohort across multiple graphs). Check it out the [video](https://www.youtube.com/watch?v=qcZ4sB-RUk4).
 
 ### An Investigation into a Drop in Gun Deaths in February
 
