@@ -1,2 +1,9 @@
+# Python stuff
 .ipynb_checkpoints
-*.class 
+*.class
+.pytest_cache
+
+# R stuff
+.RData
+.Rhistory
+Rplots.pdf
