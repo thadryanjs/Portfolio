@@ -1,0 +1,618 @@
+---
+title: "Preliminary Results of an Anaylsis of Seasonal Patterns in Gun Deaths Including a Drop in Februaries"
+author: "Thadryan J. Sweeney"
+output:
+  html_document: 
+    df_print: kable
+    highlight: tango
+    theme: cerulean
+  html_notebook:
+    df_print: kable
+    highlight: haddock
+    theme: spacelab
+  pdf_document:
+    highlight: zenburn
+---
+
+## Introduction
+
+Last year, I read a project by FiveThirtyEight examining CDC gun deaths data for the years 2012-14. The dataset is publicly [available](https://github.com/fivethirtyeight/guns-data) so I decided to look through it myself out of curiosity. When I plotted the gun deaths over time, I noticed a suspicious looking dip in February of each year. I did a little digging and found that seasonality-related issues had gotten a little media attention [here](https://chicago.suntimes.com/news/chicago-gun-violence-february/), [here](http://www.baltimoresun.com/news/maryland/crime/bs-md-ci-february-homicides-20180301-story.html), [here](https://www.usatoday.com/story/news/2018/03/01/murders-shootings-down-chicago-1st-two-months-2018/385074002/), and [here](https://www.usatoday.com/story/news/2016/12/21/season-gun-accidents-deaths-spike-during-holidays/95690064/). We'll visualized the dataset at a high level before investigating seasonal trends, with a particular interests in drops during February vs other winter months.
+
+```{R Libraries, message=FALSE, warning=FALSE}
+library(tidyverse)    # obviously  
+library(outliers)     # chi-squared
+library(reshape2)     # melt dataframe
+library(kableExtra)   # pretty output
+library(DataExplorer) # streamlined exploratory analysis
+library(ggpubr)       # plot density
+library(ggthemes)     # color schemes for ggplot
+library(e1071)        # skewness 
+library(fma)          # seasonality
+```
+
+We begin by reading in the dataset, inspecting the first few rows, summarizing it, and getting a sense of where the missing values are.
+
+```{R The Dataset}
+# read in the data, inspect and summaraize
+dRaw <- read.csv("Data/full_data.csv", stringsAsFactors = FALSE)
+
+# look at the first few rows
+kable(head(dRaw)) %>% kable_styling()
+```
+
+```{R Basic Summary, fig.align='center'}
+# typical summary 
+dim(dRaw)
+summary(dRaw)
+
+# get proportions of missing values
+plot_missing(dRaw)
+
+# what percentage of the data set do we keep if we simply drop NAs?
+nrow(na.omit(dRaw))/nrow(dRaw)
+```
+
+This suggests a fairly large data set without a lot of missing values. For simplicity, we will simply drop rows where there is information missing (more on this later). 
+
+## Overview of the Dataset
+
+We'll clean up the dataset a bit and familiarize ourselves with its features before looking at the deaths over time. 
+
+```{R Clean Dataset}
+# remove incomplete rows and the X column
+d <- na.omit(dRaw[, 2:(ncol(dRaw))])
+
+# convert police to factor
+d$police[d$police == 1] <- "yes"
+d$police[d$police == 0] <- "no"
+d$police <- as.factor(d$police)
+
+kable(head(d)) %>% kable_styling()
+```
+
+The DataExplorer packages gives ready made visualizations. Let's get some high level summaries of the categories and see what's worth taking a closer look at. 
+
+```{R Summary Visualizations - Continuous, fig.width = 12, fig.align='center'}
+# continuous 
+plot_histogram(d)
+```
+
+```{R Summary Visualizations - Categorical, fig.width = 12, fig.align='center'}
+# categorical
+plot_bar(d)
+```
+
+It looks like the Hispanic column is redundant and contains little variation. The age of the subjects seems to exhibit some patterns, as does the deaths per months. There is little variation from year to year.
+
+Let's write some custom functions to look at the categories in more nuanced way.
+
+```{R Custom PLotting Functions}
+# basic plot for our continous variables
+plotContinuous <- function(df, colString, annotate = FALSE)
+{
+  # create a histogram
+  p <- ggplot(df, aes(df[, colString])) +
+        geom_histogram(fill = "Dark Grey", binwidth = 1, col = "Black") +
+        theme_economist() +
+        scale_color_economist() +
+        xlab(colString)
+    
+    # allow addition of an annotation and mean line if desired
+    if(isTRUE(annotate)) {
+      p <- p + geom_vline(xintercept = mean(d[, colString]), color = "Dark Blue" ) +
+                ggtitle(paste("mean:", round(mean(d[, colString]), 2)))
+    }
+  p
+}
+
+# customized plotes for categorical variables
+plotCategorical <- function(df, colString)
+{
+  # create a bar plot
+  ggplot(df, aes(df[, colString])) +
+    geom_bar(fill = "Dark Grey", col = "Black") +  xlab(colString) +
+    theme_economist() +
+    scale_color_economist() +
+    theme(axis.text.x = element_text(angle = 75, hjust = 0, size = 12)) +
+    scale_x_discrete(label = function(x) abbreviate(x, minlength = 10))
+}
+```
+
+We're ready to zoom in on a few things.
+
+## Inspect Continuous Features
+
+We will start with the continuous variables.
+
+### Age
+
+A closer looks at the ages of the subjects:
+
+```{R Inspect Continous Features, fig.align='center'}
+plotContinuous(d, c("age"), annotate = TRUE) +
+  scale_x_continuous(breaks = seq(0, 100, by = 5))
+```
+
+The amount of deaths by age sees a pronounced spike in early 20's, drops in the 30's, and rises again in the first half of the 50's.
+
+### Month
+
+Deaths by month:
+
+```{R Month, fig.align='center'}
+plotContinuous(d, c("month")) + scale_x_continuous(breaks = seq(from = 1, to = 12, by = 1))
+```
+
+There appears to be a drop in February that may be a trend or an error in the data collection. Deaths curve up slightly in the summer time. 
+
+### Year
+
+Deaths over the years in the dataset:
+
+```{R Year, fig.align='center'}
+plotContinuous(d, c("year")) 
+```
+
+Year to year variation is basically null.
+
+### Continuous Features Takeaway
+
+Age related trends emerge in the 20's and 50's (increase). There appears to be a dip in gun deaths in February, and a slight upward trend through the summer. The years in our dataset are very similar in totals. 
+
+## Inspect Categorical Features
+
+An overview of the categorical features.
+
+### Intent
+
+The determined intent behind the fatality:
+
+```{R Intents, fig.align='center'}
+# intent of gun death 
+plotCategorical(d, c("intent"))
+```
+
+Very few of our observations are accidental or undetermined. Suicides readily outnumber homicides.
+
+### Sex
+
+The sex of the subject:
+
+```{R Sex, fig.align='center'}
+# ditribution of sex 
+plotCategorical(d, c("sex"))
+```
+
+The dataset is strongly male dominated.
+
+### Race
+
+The race of the subject:
+
+```{R Race, fig.align='center'}
+# distribution of race
+plotCategorical(d, c("race"))
+```
+
+Most deaths are of White subjects, followed by Black then Hispanic. Native America and Asian deaths are much less common.
+
+### Place
+
+```{R Place, fig.align='center'}
+# location of shooting
+plotCategorical(d, c("place"))
+```
+
+Most deaths take place in the home, without a strong second-place candidate.
+
+### Education
+
+```{R Education, fig.align='center'}
+# education level of subject
+plotCategorical(d, c("education"))
+```
+
+HS/GED educated subjects make up our largest groups, with college-educated subjects the smallest.
+
+### Police
+
+```{R Police, fig.align='center'}
+# police involvment
+plotCategorical(d, c("police"))
+```
+
+Very few of our observations involve Police.
+
+### Continuous Features Takeaway
+
+The demographics of our dataset: race is predominantly white, overwhelmingly male, mostly of high school education. Suicides make up the majority of deaths. Most deaths occur inside the home, and do not involve police.
+
+## The Question of February
+
+Having gotten familiar with the content of our dataset, we will begin our investigation of February-specific trends. Let's extract the data by year:
+
+```{R Count Deaths Per Month By Year}
+# sequence of 1-12
+monthNumbers <- seq(from = 1, to = 12, by = 1)
+
+# subset the deaths by year and count them by month, bind into dataframe
+dDeathsByMonthByYear <- data.frame(
+  cbind(
+    monthNumbers,
+    d %>% filter(year == 2012) %>% group_by(month) %>% count %>% .$n,
+    d %>% filter(year == 2013) %>% group_by(month) %>% count %>% .$n,
+    d %>% filter(year == 2014) %>% group_by(month) %>% count %>% .$n
+  )
+)
+
+# set sensible column names
+colnames(dDeathsByMonthByYear) <- c("month", "yr2012","yr2013","yr2014")
+
+kable(dDeathsByMonthByYear) %>% kable_styling()
+```
+
+We now have an organized count by each month, and can plot them over the years in the data. Because the months vary in their number of days, we will also scale the counts to what they would have had if they were all 31 days long (IE, February deaths in a non-leap year are [x * (31/28))].
+
+```{R Prepare Deaths over Years Dataset}
+# creates a dataframe associating months with counts and years
+dMelt <- melt(dDeathsByMonthByYear, id.vars = "month")
+
+colnames(dMelt) <- c("month", "year", "deaths")
+
+# inspect new frame
+kable(head(dMelt)) %>% kable_styling()
+
+# copy the melted data to scale it
+dMeltNorm <- dMelt
+
+# iterate over melted data
+for(i in 1:nrow(dMeltNorm)){
+  
+  # if it's a month with 30 days, multiply deaths by 31/30
+  if(dMeltNorm$month[i] %in% c(4,6,9,11)){
+    dMeltNorm$deaths[i] <- dMeltNorm$deaths[i] * (31/30)
+
+  # it is a february..
+  }else if(dMeltNorm$month[i] == 2){
+      # ... in a leap year
+      if(dMeltNorm$year[i] == "yr2012"){
+        dMeltNorm$deaths[i] <- dMeltNorm$deaths[i] * (31/29)
+      } else {
+        dMeltNorm$deaths[i] <- dMeltNorm$deaths[i] * (31/28)
+    }
+  }
+}
+kable(dMeltNorm) %>% kable_styling()
+```
+
+We will plot the scaled and unscaled data:
+
+```{R Plot Deaths Over Years, fig.width=12,fig.height=4}
+# plot the results on a line graph
+deathsByYearPlot <- 
+  ggplotGrob(ggplot(dMelt, aes(month,deaths, col =  year)) + 
+    ggtitle("Deaths By Year [Unscaled]") +
+    geom_line() +
+    scale_y_continuous(limits = c(2000, 3250), breaks = seq(1650, 3350, by = 250)) +
+    scale_x_continuous(breaks = monthNumbers) +
+    scale_color_economist() + theme_economist())
+
+# plot the results on a line graph
+deathsByYearPlot31Scaled <-
+  ggplotGrob(ggplot(dMeltNorm, aes(month,deaths, col =  year)) + 
+    ggtitle("Deaths By Year [Scaled]") +
+    geom_line() +
+    scale_y_continuous(limits = c(2000, 3250), breaks = seq(1650, 3350, by = 250)) +
+    scale_x_continuous(breaks = monthNumbers) +
+    scale_color_economist() + theme_economist())
+
+ggarrange(deathsByYearPlot, deathsByYearPlot31Scaled)
+```
+
+There is a noticeable drop in total deaths in February in each year of the dataset. Before we assume there is something unusual about February, let's check for other reasons this could be happening.
+
+### February Missing Values
+
+First, we make sure that the missing rows, while relatively few, don't cause the drop.
+
+```{R February in Entries Omitted}
+
+# what percent of the raw dataset is February
+percentMissingFeb <- filter(dRaw, month == 2) %>% nrow/nrow(dRaw)
+
+# what percent of the working dataset is February
+percentCompleteFeb <- filter(d, month == 2) %>% nrow/nrow(d)
+
+paste(percentMissingFeb, "vs", percentCompleteFeb, sep = " ")
+```
+
+February takes up almost exactly the same proportion of the missing vs utilized dataset, suggesting there must be another reason for the drop.
+
+### Deaths per Day by Month in Dataset
+
+Let's investigate the deaths by month as relates to the number of days the month accounts for in the dataset.
+
+```{R Deaths Per Day}
+# calculate deaths total number of deaths per month
+getDeaths <- function(df, monthNum, perDay = FALSE) { df %>% filter(month == monthNum) %>% nrow }
+
+# return the number of days of that month in the whole dataset
+daysByMonth <- function(month)
+{
+  if(month %in% c(1,3,5,7,8,10,12)){
+    return(31 * 3)
+  }else if(month %in% c(4,6,9,11)){
+    return(30 * 3)
+  }else{
+    # there is a leap year in the dataset
+    return((28*3)+1)
+  }
+}
+
+# get the number of deaths in each month
+numberOfDeaths <- sapply(monthNumbers, getDeaths, df = d)
+
+# number of deaths per day in that month across dataset ie, overall deaths in February
+deathsPerMonth <- numberOfDeaths/sapply(monthNumbers, daysByMonth)
+
+# z score of the deaths per month
+zScoreDeathsPerMonth <- scale(deathsPerMonth)
+
+# create a data frame of this information
+dDeathsPerMonth <- data.frame(cbind(monthNumbers, numberOfDeaths,
+                                    deathsPerMonth, zScoreDeathsPerMonth))
+
+colnames(dDeathsPerMonth) <- c("month", "numberOfDeaths",
+                               "overallDeathsByMonth", "zScoreOverallDeathsByMonth")
+
+# print a pretty summary
+kable(dDeathsPerMonth) %>% kable_styling(position = "center", full_width = TRUE) 
+```
+
+By Z-score, February (-2.2983847) stands out in deaths adjusted by total number of days in the dataset, clocking in over a full standard deviation further from the mean that the next most deviant month (July, 1.2736148).
+
+### Statistical Test For Outliers
+
+Let's apply some statistical heuristics for detecting outliers to see what sticks out. 
+
+```{R Revist dDeathsByMonthByYear}
+
+# use scaled data
+dDeathsByMonthByYear$yr2012 <- dMeltNorm[1:12, "deaths"]
+dDeathsByMonthByYear$yr2013 <- dMeltNorm[13:24, "deaths"]
+dDeathsByMonthByYear$yr2014 <- dMeltNorm[25:36, "deaths"]
+
+kable(dDeathsByMonthByYear) %>% kable_styling()
+```
+
+#### Chi-square Test
+
+We will apply a simple Chi-square test for outliers to each year in the dataset.
+```{R Chi-square Test for Outliers}
+# call chi-square outlier tests on each year in the dataset
+
+# chisq for 2012
+chisq.out.test(dDeathsByMonthByYear$yr2012,
+               variance = var(dDeathsByMonthByYear$yr2012),
+               opposite = FALSE)
+
+# chisq for 2013
+chisq.out.test(dDeathsByMonthByYear$yr2013,
+               variance=var(dDeathsByMonthByYear$yr2013),
+               opposite = FALSE)
+
+# chisq for 2013 - lower range
+chisq.out.test(dDeathsByMonthByYear$yr2013,
+               variance=var(dDeathsByMonthByYear$yr2013),
+               opposite = TRUE)
+
+# chisq for 2014
+chisq.out.test(dDeathsByMonthByYear$yr2014,
+               variance=var(dDeathsByMonthByYear$yr2014),
+               opposite = FALSE)
+```
+
+This guideline tags February as the most notable outlier in 2012 and 2014. July surfaces again as the most deviant figure in 2013, though February comes up again if the function is instructed to look for the lowest outlier. The outlier package in R also allows for a p-value cutoff.
+
+```{R Chi-square with Probability}
+
+# 0.90
+scores(dDeathsByMonthByYear$yr2012, type = "chisq", p = 0.90)
+scores(dDeathsByMonthByYear$yr2013, type = "chisq", p = 0.90)
+scores(dDeathsByMonthByYear$yr2014, type = "chisq", p = 0.90)
+
+# 0.95
+scores(dDeathsByMonthByYear$yr2012, type = "chisq", p = 0.95)
+scores(dDeathsByMonthByYear$yr2013, type = "chisq", p = 0.95)
+scores(dDeathsByMonthByYear$yr2014, type = "chisq", p = 0.95)
+```
+
+February passes a 0.90 cutoff in all three years and a 0.95 in 2012. July emerges again in two of the six tests as well. Interestingly, these five instances are the only ones flagged in either case. Next, let's get some estimates of the distribution of the data.
+
+### Distribution & Skewness of Deaths by Year
+
+Let's inspect the distribution and skewness of the death in years using density & qqplots.
+
+```{R Density and QQplots, fig.width = 9,fig.height = 12, fig.align='center'}
+
+# custom wrapper for density
+plotDensity <- function(df, year)
+{
+  ggplotGrob(
+    ggdensity(
+      df[[year]], main = paste(year, " skewness =", round(skewness(df[[year]]), 4))
+    ) + theme_economist()
+  )
+}
+
+# arrange 3x2 column of charts
+ggarrange(
+  
+  # create density plots and qqplot for 2012
+  plotDensity(dDeathsByMonthByYear, "yr2012"), 
+  
+  ggplotGrob(
+      ggqqplot(dDeathsByMonthByYear$yr2012) + theme_economist()
+  ),
+
+  
+  # create density plots and qqplot for 2013
+  plotDensity(dDeathsByMonthByYear, "yr2013"),
+  
+  ggplotGrob(
+    ggqqplot(dDeathsByMonthByYear$yr2013) + theme_economist()
+  ),
+  
+  
+  # create density plots and qqplot for 2014
+  plotDensity(dDeathsByMonthByYear, "yr2014"),
+  
+  ggplotGrob(
+    ggqqplot(dDeathsByMonthByYear$yr2014) + theme_economist()
+  ),
+  
+  nrow = 3, ncol = 2
+)
+```
+
+The skew varies from year to year, with the qqplot suggesting largely normal distribution for 2012 and 2014 and a "heavy tailed" break from normality in 2013. We can further formalize this with a Shapiro-Wilk test:
+
+```{R Shapiro-Wilks Test}
+shapiro.test(dDeathsByMonthByYear$yr2012)
+shapiro.test(dDeathsByMonthByYear$yr2013)
+shapiro.test(dDeathsByMonthByYear$yr2014)
+```
+
+Given the p-values, we're unable to reject the null hypothesis the samples come from a normal distribution. 
+
+## Modeling
+
+Lastly, let's train some linear models and examine the influence of the month on them by Cook's distance.
+
+### Cook's Distance
+
+We'll write some code to plot the Cook's distance vs 4x the mean to see what emerges.
+
+```{R Cook Distance, fig.width = 12, fig.height = 4}
+
+# custom Cook's distance plot code
+plotCooksDistance <- function(df, name)
+{
+  # set months and names
+  df$month <- seq(1,12,1)
+  colnames(df) <- c("score", "month")
+  # wrap in a rendering object for scaling purposes
+  ggplotGrob(
+    # make a point plot with the values of the model
+    ggplot(df, aes(month, score)) + 
+      geom_point() +
+      scale_y_continuous(limits = c(0,0.8)) +
+      scale_x_continuous(breaks = seq(1,12,1)) +
+      # denote 4 times the mean
+      geom_hline(yintercept = mean(df$score * 4)) +
+      geom_text(aes(x = 6, label = "4 x mean", y = 0.4),
+                colour = "Dark Blue",
+                angle = 0, size = 5) +
+      ggtitle(name) +
+      theme_economist() +
+      scale_color_economist()
+  )
+}
+
+# plot cook's distance charts for each year
+ggarrange(
+  plotCooksDistance(
+    data.frame(cooks.distance(lm(yr2012 ~ month, dDeathsByMonthByYear))), "2012"
+  ),
+  plotCooksDistance(
+    data.frame(cooks.distance(lm(yr2013 ~ month, dDeathsByMonthByYear))), "2013"
+  ),
+  plotCooksDistance(
+    data.frame(cooks.distance(lm(yr2014 ~ month, dDeathsByMonthByYear))), "2014"
+  ),
+  nrow = 1, ncol = 3
+)
+```
+
+February easily exceeds 4 times the mean influence in a linear model by cooks distance in 2012, 2013, though no months do in 2014. Notably, February stands apart from other winter months.
+
+## Seasonality
+
+Given we're looking at time data, we should also consider evidence of seasonality. It is frequently observed that [crime rises in the summer](https://www.thoughtco.com/why-does-crime-spike-in-summer-3026089). That arguably suggests that it returns to a baseline after the summer, it's less often noted that is rises in the summer *and* drops in the winter. This does not seem to be how the idea is framed (I get 85,300,000 hits on google when I search "crime rises in summer" vs only 20,000,000 for "crime drops in winter"). Perhaps the trends are less pronounced, leading to less [media attention](https://www.nbcnews.com/news/us-news/does-cold-stop-crime-it-seems-so-n309856). To investigate, we will plot the deaths over the course of all three years in a row instead of over one another. 
+
+```{R Deaths Over Time, fig.width = 12, fig.height = 6}
+
+# copy the normalized melted data
+dTimeSeries <- dMeltNorm
+
+# set 3-year months
+dTimeSeries$month <- seq(1,36,1)
+
+# plot over 3 years
+ggplot(dTimeSeries, aes(month, deaths)) +
+  ggtitle("Deaths 2012-14, Feb. Highlighted [Scaled]") +
+  geom_line(color = "Dark Blue", size = 1) +
+  # highlight februaries
+  geom_vline(xintercept = c(2,14,26), size = 0.5, color = "Dark Grey") +
+  # denote the mean
+  geom_hline(yintercept = mean(dTimeSeries$deaths)) +
+  geom_hline(
+    yintercept = mean(dTimeSeries$deaths) + sd(dTimeSeries$deaths),
+    size = 0.40, linetype = "dashed"
+  ) +
+  geom_hline(
+    yintercept = mean(dTimeSeries$deaths) - sd(dTimeSeries$deaths),
+    size = 0.40, linetype = "dashed"
+  ) +
+  scale_y_continuous(limits = c(2300, 3250),
+                     breaks = seq(1650, 3350, by = 250)) +
+  scale_x_continuous(breaks = seq(1,36,1)) +
+  # label mean and +/- standard deviations
+  geom_text(aes(x = 0, label = "+1 sd", y = 2925),
+            colour = "Black", angle = 0, size = 3) +
+  geom_text(aes(x = 0, label = "mean", y = 2800),
+            colour = "Black", angle = 0, size = 3.5) +
+  geom_text(aes(x = 0, label = "-1 sd", y = 2675),
+            colour = "Black", angle = 0, size = 3) +
+  scale_color_economist() +
+  theme_economist()
+```
+
+
+
+```{R Summer v Winter}
+
+# look at summer vs winter deviants.
+dSeasonVariants <- dMeltNorm %>%
+  select(month, deaths) %>%
+  mutate(zScore = scale(deaths)) %>%
+  filter(abs(zScore) > 1) %>%
+  arrange(month)
+
+kable(dSeasonVariants) %>% kable_styling()
+```
+Nearly as many winter months (5) stray more than a standard deviation from the mean as summer months, and they generally deviate futher when they do. This plot also suggests that a baseline could be hard to pin down - there is a six month period where the counts never vary more than one standard deviation (Aug of 2012 - Feb 2013) from the mean but it does not hold true in the other years. The other noticable steady pattern is just 4 months. 
+
+### Statistical Test for Seasonality
+
+A test for seasonality is described [here](https://robjhyndman.com/hyndsight/detecting-seasonality/). Essentially the idea is to train one model using a function that detects seasonality, if present, train another model specifying a non-seasonal method, and see if there is a statistically significant difference.
+
+```{R Seasonality}
+
+# train season model 
+seasonModel <- ets(ts(dTimeSeries$deaths, frequency = 12))
+
+# aseasonal model 
+nonSeasonModel <- ets(ts(dTimeSeries$deaths, frequency = 12), model = "ANN")
+
+# calculate significance
+deviance <- 2*c(logLik(seasonModel) - logLik(nonSeasonModel))
+df <- attributes(logLik(seasonModel))$df - attributes(logLik(nonSeasonModel))$df
+1 - pchisq(deviance,df)
+```
+
+The resulting p-value confirms our suspicion of seasonality.
+
+## Findings
+
+In this dataset, the drop in the month of cannot be explained entirely due to it's smaller number of days. After scaling it is still flagged as an outlier in all three years, including as the most extreme outlier in two of the three years (90% probability cutoff). It also deviates strongly in overall deaths per day. In 2012 & 13 it easily exceeds 4x the mean in Cook's distance. No months do in 2014. Ultimately, more years are needed to confirm the possible trend is significant; this analysis cannot fully explain or reject the possible trend. The dataset exhibits statistically significant seasonality, with similar downward variation in the winter as upward in the summer.
