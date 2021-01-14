@@ -6,9 +6,13 @@ Thanks for taking the time to look at my portfolio.
 
 For scientific work, have a look at my [CV](https://sweeney-th.github.io/cv/). For programming and data science projects, see below.
 
-### COVID19 Antibody Diagnostics App
+### COVID19 antibody diagnostics app
 
 Our [lab](https://www.omics.kitchen/) has been working with a number of collaborators on a study of lateral flow assays for the detection of SARS-CoV-2 antibodies. We've designed and implemented an interactive [app](https://covid.omics.kitchen/) to complement the [study](https://www.medrxiv.org/content/10.1101/2021.01.02.20248998v1). Interested parties getting an antibody test are advised to speak with their healthcare provider about interpreting their results with that app, which uses local COVID19 prevelance data from [usafacts.org](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) (also used by the CDC) and measurments from the study to estimate the probability they do or do not have SARS-CoV-2 antibodies given their result.
+
+### A case study of silent data corruption in an RNA-Seq experiment: Don't get buRned by factors
+
+A misleading error message and some weird factor behavior is all it takes to spoof the results of a differential expression analysis. You have been [warned!](https://github.com/sweeney-th/type-issue-case-study)
 
 ### An Investigation into a Drop in Gun Deaths in February
 
