@@ -32,10 +32,9 @@ ASH uses a scale based on hyrdophilicity to compare residues. It used this scale
 
 Because analyzing text presents numerous challenges in the form of word-stemming, context, and tone, I wrote a tweet [classifier](https://nbviewer.jupyter.org/github/sweeney-th/Portfolio/blob/master/DataScience/TwitterClassifier/signatureProject.pdf) that uses only numeric metadata to predict determine if a given message came from the handle of Hillary Clinton or Donald Trump. It uses a Kaggle dataset that I heavily re-engineered using Python scripts to more than double its wide. The classifier() works with ~97% accuracy.
 
-### PythonInTheWyld.com
+### The National Survivor Financial Security Policy Map and Scorecard
 
-I am building a [teach-yourself-python website](http://pythoninthewyld.com/). I am not a heavy social media user, but do keep up a light presence for the site, so feel free to [get in touch](http://pythoninthewyld.com/home/contact/).
-
+My first foray into "hacktivism" involved working on [this webap](https://mapandscorecard.freefrom.org/).
 ### Examples by language
 
 [Here](https://github.com/sweeney-th/Portfolio/tree/master/Misc/ExamplesByLanguage) you will find smaller programs where practice a variety of languages: Python, Perl, C, and Java. For R code, see the above classifier as I generally use it for Data Science tasks only.
