@@ -10,6 +10,9 @@ For scientific work, have a look at my [CV](https://sweeney-th.github.io/cv/). F
 
 Our [lab](https://www.omics.kitchen/) has been working with a number of collaborators on a study of lateral flow assays for the detection of SARS-CoV-2 antibodies. We've designed and implemented an interactive [app](https://covid.omics.kitchen/) to complement the [study](https://www.medrxiv.org/content/10.1101/2021.01.02.20248998v1). Interested parties getting an antibody test are advised to speak with their healthcare provider about interpreting their results with that app, which uses local COVID19 prevelance data from [usafacts.org](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) (also used by the CDC) and measurments from the study to estimate the probability they do or do not have SARS-CoV-2 antibodies given their result.
 
+### ContrApption: An R package providing interactive JavaScript visualizations for RNA-Seq style datasets
+
+Check it out [here](https://github.com/omics-kitchen/ContrApption).
 
 ### The National Survivor Financial Security Policy Map and Scorecard
 
