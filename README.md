@@ -10,6 +10,11 @@ For scientific work, have a look at my [CV](https://sweeney-th.github.io/cv/). F
 
 Our [lab](https://www.omics.kitchen/) has been working with a number of collaborators on a study of lateral flow assays for the detection of SARS-CoV-2 antibodies. We've designed and implemented an interactive [app](https://covid.omics.kitchen/) to complement the [study](https://www.medrxiv.org/content/10.1101/2021.01.02.20248998v1). Interested parties getting an antibody test are advised to speak with their healthcare provider about interpreting their results with that app, which uses local COVID19 prevelance data from [usafacts.org](https://usafacts.org/visualizations/coronavirus-covid-19-spread-map/) (also used by the CDC) and measurments from the study to estimate the probability they do or do not have SARS-CoV-2 antibodies given their result.
 
+
+### The National Survivor Financial Security Policy Map and Scorecard
+
+My first foray into "hacktivism" involved working on [this webap](https://mapandscorecard.freefrom.org/).
+
 ### A case study of silent data corruption in an RNA-Seq experiment: Don't get buRned by factors
 
 A misleading error message and some weird factor behavior is all it takes to spoof the results of a differential expression analysis. You have been [warned!](https://github.com/sweeney-th/type-issue-case-study)
@@ -32,9 +37,7 @@ ASH uses a scale based on hyrdophilicity to compare residues. It used this scale
 
 Because analyzing text presents numerous challenges in the form of word-stemming, context, and tone, I wrote a tweet [classifier](https://nbviewer.jupyter.org/github/sweeney-th/Portfolio/blob/master/DataScience/TwitterClassifier/signatureProject.pdf) that uses only numeric metadata to predict determine if a given message came from the handle of Hillary Clinton or Donald Trump. It uses a Kaggle dataset that I heavily re-engineered using Python scripts to more than double its wide. The classifier() works with ~97% accuracy.
 
-### The National Survivor Financial Security Policy Map and Scorecard
 
-My first foray into "hacktivism" involved working on [this webap](https://mapandscorecard.freefrom.org/).
 ### Examples by language
 
 [Here](https://github.com/sweeney-th/Portfolio/tree/master/Misc/ExamplesByLanguage) you will find smaller programs where practice a variety of languages: Python, Perl, C, and Java. For R code, see the above classifier as I generally use it for Data Science tasks only.
