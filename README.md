@@ -16,7 +16,7 @@ Check it out [here](https://github.com/omics-kitchen/ContrApption).
 
 ### The National Survivor Financial Security Policy Map and Scorecard
 
-My first foray into "hacktivism" involved working on [this webap](https://mapandscorecard.freefrom.org/).
+My first foray into "hacktivism" involved working on [this web app](https://mapandscorecard.freefrom.org/).
 
 ### A case study of silent data corruption in an RNA-Seq experiment: Don't get buRned by factors
 
